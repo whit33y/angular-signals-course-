@@ -8,11 +8,17 @@
     Add Course
   </button>
 
+  <!-- <button class="btn" (click)="onToObservableExample()"> -->
+  <button class="btn">
+    toObservable()
+  </button>
+
+
   <mat-tab-group>
 
     <mat-tab label="Beginners">
       <courses-card-list [courses]="beginnerCourses()" (courseUpdated)="onCourseUpdated($event)"
-        (courseDeleted)="onCourseDeleted($event)" />
+        (courseDeleted)="onCourseDeleted($event)" #beginnersList matTooltip="These are the beginner courses!" />
     </mat-tab>
 
     <mat-tab label="Advanced">

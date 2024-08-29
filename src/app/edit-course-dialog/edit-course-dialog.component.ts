@@ -29,6 +29,7 @@ export class EditCourseDialogComponent {
   coursesService = inject(CoursesService);
   async onSave() {
     const courseProps = this.form.value as Partial<Course>;
+    courseProps.category = this.category();
     console.log(courseProps);
     if (this.data?.mode === 'update') {
       await this.saveCourse(this.data?.course!.id, courseProps);
@@ -68,7 +69,6 @@ export class EditCourseDialogComponent {
   form = this.fb.group({
     title: [''],
     longDescription: [''],
-    category: [''],
     iconUrl: [''],
   });
 
@@ -76,10 +76,15 @@ export class EditCourseDialogComponent {
     this.form.patchValue({
       title: this.data?.course?.title,
       longDescription: this.data?.course?.longDescription,
-      category: this.data?.course?.category,
       iconUrl: this.data?.course?.iconUrl,
     });
+    this.category.set(this?.data.course?.category ?? 'BEGINNER');
+    effect(() => {
+      console.log(this.category);
+    });
   }
+
+  category = signal<CourseCategory>('BEGINNER');
 }
 
 export async function openEditCourseDialog(

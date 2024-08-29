@@ -3,10 +3,12 @@ import {
   Component,
   computed,
   effect,
+  ElementRef,
   inject,
   Injector,
   OnInit,
   signal,
+  viewChild,
 } from '@angular/core';
 import { CoursesService } from '../services/courses.service';
 import { Course, sortCoursesBySeqNo } from '../models/course.model';
@@ -43,6 +45,9 @@ export class HomeComponent implements OnInit {
       mode: 'create',
       title: 'Create new course!',
     });
+    if (!newCourse) {
+      return;
+    }
     const newCourses = [...this.#courses(), newCourse];
     this.#courses.set(newCourses);
   }
@@ -71,14 +76,18 @@ export class HomeComponent implements OnInit {
     this.loadCourses().then(() =>
       console.log(`Courses loaded: `, this.#courses())
     );
+    // this.courses$.subscribe((courses) => console.log(`courses$: `, courses));
     // afterNextRender(()=>{
     //   this.loadCourses().then(() =>
     //     console.log(`Courses loaded: `, this.courses())
     //   );
     // })
     effect(() => {
-      console.log('Beginner courses: ', this.beginnerCourses());
-      console.log('Advanced courses: ', this.advancedCourses());
+      // console.log('Beginner courses: ', this.beginnerCourses());
+      // console.log('Advanced courses: ', this.advancedCourses());
+    });
+    effect(() => {
+      // console.log(`Beginners list: `, this.beginnersList());
     });
   }
 
@@ -120,6 +129,12 @@ export class HomeComponent implements OnInit {
     // }
   }
 
+  // beginnersList = viewChild<CoursesCardListComponent>('beginnersList');
+  beginnersList = viewChild('beginnersList', {
+    read: ElementRef,
+    // read: MatToolTip
+  });
+
   // counter = signal<Counter>({ value: 100 });
   // counter = signal(0).asReadonly();
   // increment() {
@@ -135,4 +150,33 @@ export class HomeComponent implements OnInit {
   // append() {
   //   this.values.update((values) => [...values, values[values.length - 1] + 1]);
   // }
+
+  // courses$ = toObservable(this.#courses);
+
+  injector = inject(Injector);
+  // onToObservableExample() {
+  //   // const courses$ = toObservable(this.#courses, {
+  //   //   injector: this.injector,
+  //   // });
+  //   // courses$.subscribe((courses) => console.log(courses));
+  //   const numbers = signal(0);
+  //   const numbers$ = toObservable(numbers, {
+  //     injector: this.injector,
+  //   });
+  //   numbers$.subscribe((number) => {
+  //     console.log(`numbers$: `, number);
+  //   });
+  // }
+  course$ = from(this.coursesService.loadAllCourses());
+  onToSignalExample() {
+    const courses = toSignal(this.course$, { injector: this.injector });
+    effect(
+      () => {
+        console.log(`courses:`, courses());
+      },
+      {
+        injector: this.injector,
+      }
+    );
+  }
 }

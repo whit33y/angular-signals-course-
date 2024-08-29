@@ -31,4 +31,7 @@ import { AuthService } from './services/auth.service';
 export class AppComponent {
   authService = inject(AuthService);
   isLoggedIn = this.authService.isLoggedIn;
+  onLogout() {
+    this.authService.logout();
+  }
 }
